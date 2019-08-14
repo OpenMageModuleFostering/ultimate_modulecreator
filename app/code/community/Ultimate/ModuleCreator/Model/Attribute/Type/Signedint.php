@@ -1,4 +1,4 @@
-<?php
+<?php 
 /**
  * Ultimate_ModuleCreator extension
  *
@@ -16,23 +16,18 @@
  * @author         Marius Strajeru <ultimate.module.creator@gmail.com>
  */
 /**
- * attribute system->config fieldset renderer
+ * int attribute type
  *
  * @category    Ultimate
  * @package     Ultimate_ModuleCreator
  * @author      Marius Strajeru <ultimate.module.creator@gmail.com>
  */
-class Ultimate_ModuleCreator_Block_Adminhtml_Modulecreator_System_Config_Form_Fieldset_Attribute extends Ultimate_ModuleCreator_Block_Adminhtml_Modulecreator_System_Config_Form_Fieldset_Abstract
+class Ultimate_ModuleCreator_Model_Attribute_Type_Signedint extends Ultimate_ModuleCreator_Model_Attribute_Type_Int
 {
     /**
-     * get the form name from umc.xml
+     * type code
      *
-     * @access public
-     * @return mixed|string
-     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     * @var string
      */
-    public function getFormName()
-    {
-        return 'attribute';
-    }
+    protected $_type        = 'signedint';
 }
