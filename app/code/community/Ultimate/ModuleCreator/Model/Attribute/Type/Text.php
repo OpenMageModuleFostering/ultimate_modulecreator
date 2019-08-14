@@ -9,18 +9,36 @@
  * It is also available through the world-wide-web at this URL:
  * http://opensource.org/licenses/mit-license.php
  *
- * @category   	Ultimate
- * @package		Ultimate_ModuleCreator
- * @copyright  	Copyright (c) 2012
- * @license		http://opensource.org/licenses/mit-license.php MIT License
- */ 
+ * @category       Ultimate
+ * @package        Ultimate_ModuleCreator
+ * @copyright      Copyright (c) 2014
+ * @license        http://opensource.org/licenses/mit-license.php MIT License
+ * @author         Marius Strajeru <ultimate.module.creator@gmail.com>
+ */
 /**
- * attribute type text
- * 
- * @category	Ultimate
- * @package		Ultimate_ModuleCreator
- * @author 		Marius Strajeru <marius.strajeru@gmail.com>
- */ 
-class Ultimate_ModuleCreator_Model_Attribute_Type_Text extends Ultimate_ModuleCreator_Model_Attribute_Type_Abstract{
-	
+ * text attribute type
+ *
+ * @category    Ultimate
+ * @package     Ultimate_ModuleCreator
+ * @author      Marius Strajeru <ultimate.module.creator@gmail.com>
+ */
+class Ultimate_ModuleCreator_Model_Attribute_Type_Text
+    extends Ultimate_ModuleCreator_Model_Attribute_Type_Abstract {
+    /**
+     * type code
+     * @var string
+     */
+    protected $_type = 'text';
+    /**
+     * get admin column options
+     * @access public
+     * @return string
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getAdminColumnOptions() {
+        $options = $this->getEol();
+        $options .= $this->getPadding(3);
+        $options .= "'type'=> 'text',".$this->getEol();
+        return $options;
+    }
 }

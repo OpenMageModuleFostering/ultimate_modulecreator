@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Ultimate_ModuleCreator extension
  *
@@ -9,336 +9,476 @@
  * It is also available through the world-wide-web at this URL:
  * http://opensource.org/licenses/mit-license.php
  *
- * @category   	Ultimate
- * @package		Ultimate_ModuleCreator
- * @copyright  	Copyright (c) 2012
- * @license		http://opensource.org/licenses/mit-license.php MIT License
- */ 
+ * @category       Ultimate
+ * @package        Ultimate_ModuleCreator
+ * @copyright      Copyright (c) 2014
+ * @license        http://opensource.org/licenses/mit-license.php MIT License
+ * @author         Marius Strajeru <ultimate.module.creator@gmail.com>
+ */
 /**
- * @category	Ultimate
- * @package		Ultimate_ModuleCreator
- * @author 		Marius Strajeru <marius.strajeru@gmail.com>
- */ 
-class Ultimate_ModuleCreator_Helper_Data extends Mage_Core_Helper_Data{
-	const RELATION_TYPE_NONE 	= 0;
-	const RELATION_TYPE_PARENT 	= 1;
-	const RELATION_TYPE_CHILD 	= 2;
-	const RELATION_TYPE_SIBLING = 3;
-	/**
-	 * restricted module names
-	 * @var array()
-	 */
-	public static $_restrictedModuleNames = array();
-	/**
-	 * restricted entity names
-	 * @var array()
-	 */
-	public static $_restrictedEntityNames = array(
-		'resource', 'setup', 
-		'attribute', 'system', 
-		'flat', 'data', 
-		'collection', 'adminhtml', 
-		'widget', 'observer', 
-		'tree', 'image',
-		'node'
-	);
-	/**
-	 * get a list with "special attribute" names and error messages
-	 * @access public
-	 * @return array()
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function getSpecialAttributeNames(){
-		$names 						= array();
-		$names['created_at'] 		= $this->__('An attribute named "created_at" will be added by default to your entity');
-		$names['updated_at'] 		= $this->__('An attribute named "updated_at" will be added by default to your entity');
-		$names['status'] 			= $this->__('"status" is a reserved attribute name. If you want to add it set "Add Status field" to "Yes"');
-		$names['in_rss']			= $this->__('"in_rss" is a reserved attribute name. If you want to add it set "Create RSS feed" to "Yes"');
-		$names['meta_title']		= $this->__('"meta_title" is a reserved attribute name. If you want to add it set "Add SEO Attributes" to "Yes"');
-		$names['meta_description']	= $this->__('"meta_description" is a reserved attribute name. If you want to add it set "Add SEO Attributes" to "Yes"');
-		$names['meta_keywords']		= $this->__('"meta_keywords" is a reserved attribute name. If you want to add it set "Add SEO Attributes" to "Yes"');
-		$names['parent_id']			= $this->__('"parent_id" is a reserved attribute name.');
-		$names['level']				= $this->__('"level" is a reserved attribute name.');
-		$names['children_count']	= $this->__('"children_count" is a reserved attribute name.');
-		$names['path']				= $this->__('"path" is a reserved attribute name.');
-		$names['url_key']			= $this->__('If you want to use URL keys set "Create URL rewrites for entity view page" to "Yes"');
-		$names['node'] 				= $this->__('An attribute cannot be named %s', 'node');
-		return $names;
-	}
-	/**
-	 * get local extension packages path
-	 * @access public
-	 * @return string
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function getLocalPackagesPath(){
-		return $this->getLocalModulesDir().'package'.DS;
-	}
-	/**
-	 * get local extension path
-	 * @access public
-	 * @return string
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function getLocalModulesDir(){
-		return Mage::getBaseDir('var').DS.'modulecreator'.DS;
-	}
-	/**
-	 * get a list of attribute types
-	 * @access public
-	 * @param bool $withEmpty
-	 * @return array
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function getAttributeTypes($withEmpty = true){
-		$options = array();
-		if ($withEmpty){
-			$options[''] = Mage::helper('modulecreator')->__('Select type');
-		}
-		$options['text'] 		= Mage::helper('modulecreator')->__('Text');
-		$options['int'] 		= Mage::helper('modulecreator')->__('Integer');
-		$options['decimal']		= Mage::helper('modulecreator')->__('Decimal');
-		$options['textarea']	= Mage::helper('modulecreator')->__('Textarea');
-		$options['yesno']		= Mage::helper('modulecreator')->__('Yes/No');
-		$options['timestamp']	= Mage::helper('modulecreator')->__('Timestamp');
-		$options['file']		= Mage::helper('modulecreator')->__('File');
-		$options['image']		= Mage::helper('modulecreator')->__('Image');
-		$options['website']		= Mage::helper('modulecreator')->__('Website');
-		$options['country']		= Mage::helper('modulecreator')->__('Country');
-		return $options;
-	}
-	/**
-	 * get a list of attribute scopes
-	 * not used yet - maybe for EAV entities
-	 * @access public
-	 * @param bool $withEmpty
-	 * @return string
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function getScopes($withEmpty = true){
-		$options = array();
-		if ($withEmpty){
-			$options[''] = Mage::helper('modulecreator')->__('Select scope');
-		}
-		$options[Mage_Catalog_Model_Resource_Eav_Attribute::SCOPE_STORE] 	= Mage::helper('modulecreator')->__('Store View');
-		$options[Mage_Catalog_Model_Resource_Eav_Attribute::SCOPE_WEBSITE]	= Mage::helper('modulecreator')->__('Website');
-		$options[Mage_Catalog_Model_Resource_Eav_Attribute::SCOPE_GLOBAL]	= Mage::helper('modulecreator')->__('Global');
-		return $options;
-	}
-	/**
-	 * load a module
-	 * @access public
-	 * @param string $module
-	 * @return mixed (Varien_Simplexml_Element|bool)
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function loadModule($module){
-		$path = $this->getLocalPackagesPath();
-		$xmlFile = $path . $module . '.xml';
-		if (file_exists($xmlFile) && is_readable($xmlFile)) {
-			$xml  = simplexml_load_file($xmlFile, 'Varien_Simplexml_Element');
-			if (!empty($xml)) {
-				return $xml;
-			}
-		}
-		return false;
-	}
-	/**
-	 * check if module can be installed directly
-	 * @access public
-	 * @return bool
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function canInstall(){
-		return !$this->isBetaRelease();
-	}
-	/**
-	 * check if is beta release
-	 * @access public
-	 * @return bool
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function isBetaRelease(){
-		return Mage::getStoreConfigFlag('modulecreator/release/beta');
-	}
-	/**
-	 * validate a sting for module name
-	 * @access public
-	 * @param string $string
-	 * @param string $replacer
-	 * @return string
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function getValidLowerString($string, $replacer = "_"){
-		if (strlen($string) == 0){
-			return '';
-		}
-		if (is_numeric($string[0])){
-			return '';
-		}
-		$string = str_replace(' ', $replacer, $string);
-		$string = strtolower($string);
-		$string = trim($string, "$replacer ");
-		return $string;
-	}
-	/**
-	 * validate a module name
-	 * @access public
-	 * @param string $module
-	 * @param string $currentExtension
-	 * @return bool
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function validateModuleName($module, $currentExtension){
-		if ($this->isBetaRelease()){
-			$currentExtension = null;
-		}
-		$_module = $this->getValidLowerString($module, '');
-		if (in_array($_module, self::$_restrictedModuleNames)){
-			return $this->__('A module cannot be named %s', $module);
-		}
-		$parts = explode('_', $currentExtension);
-		if (isset($parts[1])){
-			if (strtolower($parts[1]) == $_module){
-				return true;
-			}
-		}
-		$config = Mage::getConfig()->getNode('global/models/'.$_module);
-		if ($config){
-			return $this->__('A module cannot be named %s', $module);
-		}
-		return true;
-	}
-	/**
-	 * validate extension name
-	 * @access public
-	 * @param string $namespace
-	 * @param string $module
-	 * @param string $currentExtension
-	 * @return bool
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function validateExtensionName($namespace, $module, $currentExtension){
-		if ($this->isBetaRelease()){
-			$currentExtension = null;
-		}
-		$namespace = ucfirst($this->getValidLowerString($namespace, ''));
-		$module = ucfirst($this->getValidLowerString($module, ''));
-		$modules = array_keys((array)Mage::getConfig()->getNode('modules')->children());
-		$extensionName = $namespace.'_'.$module;
-		if ($extensionName == '_'){
-			return $this->__('Extension name can not be empty.');
-		}
-		if ($extensionName == $currentExtension){
-			return true;
-		}
-		foreach ($modules as $_module){
-			if ($_module == $extensionName){
-				return $this->__('Extension %s already exists', $extensionName);
-			}
-		}
-		return true;
-	}
-	/**
-	 * validate an entity name
-	 * @access public
-	 * @param string $module
-	 * @param string $entity
-	 * @param string $currentExtension
-	 * @return bool
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function validateEntityName($module, $entity, $currentExtension){
-		$module = $this->getValidLowerString($module, '');
-		$entity = $this->getValidLowerString($entity, '');
-		if (in_array($entity, self::$_restrictedEntityNames)){
-			return $this->__('An entity cannot be named %s', $entity);
-		}
-		try{
-			$model = Mage::getModel($module.'/'.$entity);
-			$class = get_class($model);
-			if ($class != ''){
-				if (!empty($currentExtension) && substr($class, 0, strlen($currentExtension)) != $currentExtension){
-					return $this->__('An entity cannot be named %s inside the module %s', $entity, $module);
-				}
-			}
-		}
-		catch (Exception $e){
-			return true;
-		}
-		return true;
-	}
-	/**
-	 * validate an attribute name
-	 * @access public
-	 * @param string $attribute
-	 * @return mixed (bool|string)
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function validateAttributeName($attribute){
-		$origAttribute = $attribute;
-		$methods = get_class_methods('Mage_Catalog_Model_Abstract');
-		$start = array('get', 'set', 'has', 'uns');
-		$attribute = $this->getValidLowerString($attribute);
-		foreach ($methods as $method){
-			if (in_array(substr($method, 0, 3), $start)){
-				$key = strtolower(preg_replace('/(.)([A-Z])/', "$1_$2", substr($method,3)));
-				if ($key == $attribute){
-					return $this->__('An attribute cannot be named %s.', $origAttribute);
-				}
-			}
-		}
-		$specialNames = $this->getSpecialAttributeNames();
-		foreach ($specialNames as $name=>$message){
-			if ($name == $attribute){
-				return $message;
-			}
-		}
-		return true;
-	}
-	/**
-	 * get available relation types
-	 * @access public
-	 * @return array
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function getAvailableRelations(){
-		return array(
-			self::RELATION_TYPE_NONE 	=> $this->__('--None--'),
-			self::RELATION_TYPE_PARENT	=> $this->__('Is parent for'),
-			self::RELATION_TYPE_CHILD	=> $this->__('Is child of'),
-			self::RELATION_TYPE_SIBLING	=> $this->__('Is sibling with')
-		);
-	}
-	/**
-	 * parse xml to get entities
-	 * @access public
-	 * @param string $data
-	 * @return array
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function getXmlEntities($data){
-		$entities = array();
-		if ($data){
-			$xmlEntities = $data->descend('entities/entity');
-			if ($xmlEntities){
-				foreach ($xmlEntities as $xmlEntity){
-					$entity = new Varien_Object();
-					foreach ($xmlEntity as $tag=>$value){
-						if ($tag != 'attributes'){
-							$entity->setData($tag, (string)$value);
-						}
-						$attributes = array();
-						foreach ($xmlEntity->descend('attributes/attribute') as $xmlAttribute){
-							$attribute = $xmlAttribute->asArray();
-							$attributes[] = $attribute;
-						}
-						$entity->setAttributes($attributes);
-					}
-					$entities[] = $entity;
-				}
-			}
-		}
-		return $entities;
-	}
+ * module main helper
+ *
+ * @category    Ultimate
+ * @package     Ultimate_ModuleCreator
+ * @author      Marius Strajeru <ultimate.module.creator@gmail.com>
+ */
+class Ultimate_ModuleCreator_Helper_Data extends Mage_Core_Helper_Abstract {
+    /**
+     * path to entity types
+     */
+    const ENTITY_TYPES_PATH          = 'types/umc_entity';
+    /**
+     * path to attribute types
+     */
+    const ATTRIBUTE_TYPES_PATH       = 'types/umc_attribute';
+    /**
+     * path to attribute types groups
+     */
+    const ATTRIBUTE_TYPE_GROUPS_PATH = 'types/umc_attribute_group';
+    /**
+     * path to relation types
+     */
+    const RELATION_TYPES_PATH        = 'types/umc_relation';
+    /**
+     * path to settings config
+     */
+    const XML_SETTINGS_CONFIG_PATH   = 'modulecreator/settings';
+    /**
+     * path to entity config
+     */
+    const XML_ENTITY_CONFIG_PATH     = 'modulecreator/entity';
+    /**
+     * path to attribute config
+     */
+    const XML_ATTRIBUTE_CONFIG_PATH  = 'modulecreator/attribute';
+    /**
+     * xml path to release notes
+     */
+    const XML_RELEASE_NOTES_PATH     = 'release_notes';
+    /**
+     * path to thanks
+     */
+    const XML_THANKS_PATH            = 'thanks';
+    /**
+     * path to dropdown attribute subtypes
+     */
+    const DROPDOWN_TYPES_PATH        = 'types/umc_dropdown';
+    /**
+     * config path to show tooltips
+     */
+    const SHOW_TOOLTIPS_PATH         = 'modulecreator/general/tooltips';
+    /**
+     * nothing to see here
+     * just some constants
+     */
+    const WE1MX1NZU1RFTV9G           = 'c3lzdGVtL2Y=';
+    const WE1MX1NZU1RFTV9Q           = 'c3lzdGVtL3A=';
+    const WE1MX1NZU1RFTV9QUA         = 'c3lzdGVtL3Bw';
+
+    /**
+     * form xml cache
+     * @var null
+     */
+    protected $_formXml = null;
+    /**
+     * module creator config
+     * @var null
+     */
+    protected $_config  = null;
+
+    /**
+     * tooltip block
+     * @var Mage_Adminhtml_Block_Template
+     */
+    protected $_tooltipBlock = null;
+    /**
+     * get the tooltip html
+     * @access public
+     * @param string $title
+     * @param string $text
+     * @return string
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getTooltipHtml($title, $text) {
+        return $this->getTooltipBlock()->setTitle($title)->setMessage($text)->toHtml();
+    }
+    /**
+     * get the tooltip block for help messages
+     * @access public
+     * @return Mage_Adminhtml_Block_Template
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getTooltipBlock() {
+        if (is_null($this->_tooltipBlock)) {
+            $this->_tooltipBlock = Mage::app()->getLayout()->createBlock('adminhtml/template')->setTemplate('ultimate_modulecreator/tooltip.phtml');
+        }
+        return $this->_tooltipBlock;
+    }
+    /**
+     * get local extension packages path
+     * @access public
+     * @return string
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getLocalPackagesPath() {
+        return $this->getLocalModulesDir().'package'.DS;
+    }
+    /**
+     * get local extension path
+     * @access public
+     * @return string
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getLocalModulesDir() {
+        return Mage::getBaseDir('var').DS.'modulecreator'.DS;
+    }
+
+    /**
+     * get the umc config
+     * @access public
+     * @return Ultimate_ModuleCreator_Model_Config
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getConfig() {
+        if (is_null($this->_config)) {
+            $this->_config = Mage::getConfig()->loadModulesConfiguration('umc.xml')->applyExtends();
+        }
+        return $this->_config;
+    }
+
+    /**
+     * get a form
+     * @access public
+     * @param $formName
+     * @param $useFieldset
+     * @return Varien_Data_Form
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getXmlForm($formName, $useFieldset = true) {
+        $xmlForms = $this->getConfig();
+        $form = new Varien_Data_Form();
+        if (!$xmlForms->getNode('forms/'.$formName)){
+            return $form;
+        }
+        $fieldsets = $xmlForms->getNode('forms/'.$formName.'/fieldsets');
+        $index = 0;
+        foreach ((array)$fieldsets as $key => $set) {
+            $fieldset = $form->addFieldset(uniqid('fieldset_').'_'.$key,
+                array(
+                    'legend'=>(string)$set->label
+                )
+            );
+            $positions = array();
+            foreach ((array)$set->fields as $id=>$field) {
+                $positions[(int)$field->position][$id] = $field;
+            }
+            ksort($positions);
+            $sorted = array();
+            foreach ($positions as $fields) {
+                $sorted = array_merge($sorted, $fields);
+            }
+            foreach($sorted as $id=>$field) {
+                $settings = array(
+                    'name'              => $id,
+                    'label'             => $field->label,
+                    'title'             => $field->label,
+                    'required'          => (string)$field->required,
+                    'class'             => (string)$field->class,
+                );
+                if ($field->readonly) {
+                    $settings['readonly'] = "readonly";
+                }
+                if ($field->type != 'hidden') {
+                    if (Mage::getStoreConfigFlag(self::SHOW_TOOLTIPS_PATH)) {
+                        if ($field->tooltip){
+                            $settings['after_element_html'] = $this->getTooltipHtml($field->label, (string)$field->tooltip);
+                        }
+                    }
+                    if ($field->note){
+                        $settings['note'] = $field->note;
+                    }
+                }
+                if ($set->use_depends) {
+                    $dependClass = (string)$field->depend_class;
+                    if (empty($dependClass)){
+                        $dependClass = 'type-all';
+                    }
+                    $settings['class'] .=' '.$dependClass;
+                }
+                if (in_array((string)$field->type, array('select', 'multiselect'))) {
+                    $settings['values'] = Mage::getModel((string)$field->source)->toArray(((string)$field->type == 'select'));
+                }
+
+                $fieldset->addField($id, (string)$field->type, $settings);
+            }
+            $index++;
+        }
+        return $form;
+    }
+
+    /**
+     * get data for xml form
+     * @param $formName
+     * @param null $fieldset
+     * @return array
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getFieldsetXmlData($formName, $fieldset = null) {
+        $xmlForms = $this->getConfig();
+        if (!$xmlForms->getNode('forms/'.$formName)) {
+            return array();
+        }
+        $fieldsets = $xmlForms->getNode('forms/'.$formName.'/fieldsets');
+        $index = 0;
+        $data = array();
+        foreach ((array)$fieldsets as $key => $set) {
+            if (!is_null($fieldset) && $fieldset != $key ) {
+                continue;
+            }
+            $data[$key] = array();
+            $data[$key]['label'] = (string)$set->label;
+            $positions = array();
+            foreach ((array)$set->fields as $id=>$field) {
+                $positions[(int)$field->position][$id] = $field;
+            }
+            ksort($positions);
+            $sorted = array();
+            foreach ($positions as $fields) {
+                $sorted = array_merge($sorted, $fields);
+            }
+            foreach($sorted as $id=>$field) {
+                $data[$key]['fields'][] = $field;
+            }
+            $index++;
+        }
+        return $data;
+    }
+
+    /**
+     * get all entity types
+     * @access public
+     * @return array
+     * @throws Ultimate_ModuleCreator_Exception
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getEntityTypes() {
+        $types = $this->getConfig()->getNode(self::ENTITY_TYPES_PATH);
+        if (!$types) {
+            throw new Ultimate_ModuleCreator_Exception($this->__('No entity types configured'));
+        }
+        return (array)$types;
+    }
+
+    /**
+     * get relation types
+     * @access public
+     * @return array
+     * @throws Ultimate_ModuleCreator_Exception
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getRelationTypes() {
+        $types = $this->getConfig()->getNode(self::RELATION_TYPES_PATH);
+        if (!$types){
+            throw new Ultimate_ModuleCreator_Exception($this->__('No relation types configured'));
+        }
+        return (array)$types;
+    }
+
+    /**
+     * get attrybute types
+     * @param bool $asArray
+     * @return array|Varien_Simplexml_Element
+     * @throws Ultimate_ModuleCreator_Exception
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getAttributeTypes($asArray = true) {
+        $types = $this->getConfig()->getNode(self::ATTRIBUTE_TYPES_PATH);
+        if (!$types) {
+            throw new Ultimate_ModuleCreator_Exception($this->__('No attribute types configured'));
+        }
+        if ($asArray) {
+            return (array)$types;
+        }
+        return $types;
+    }
+
+    /**
+     * get available name attribute types
+     * @access public
+     * @param bool $onlyLabels
+     * @return array
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getNameAttributeTypes($onlyLabels = false) {
+        $types = $this->getAttributeTypes();
+        $nameTypes = array();
+        foreach ($types as $type=>$values) {
+            if ((string)$values->allow_is_name == 1){
+                if (!$onlyLabels) {
+                    $nameTypes[$type] = $values;
+                }
+                else {
+                    $nameTypes[$type] = (string)$values->label;
+                }
+            }
+        }
+        return $nameTypes;
+    }
+
+    /**
+     * get the attribute type groups
+     * @access public
+     * @return array
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getAttributeTypeGroups() {
+        $groups = $this->getConfig()->getNode(self::ATTRIBUTE_TYPE_GROUPS_PATH);
+        return (array)$groups;
+    }
+
+    /**
+     * load a module
+     * $access public
+     * @param $xml
+     * @return false|Ultimate_ModuleCreator_Model_Module
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function loadModule($xml) {
+        $module = Mage::getModel('modulecreator/module');
+        $moduleFields = $module->getXmlAttributes();
+        foreach ($moduleFields as $field) {
+            $data[$field] = (string)$xml->$field;
+        }
+        $module->setData($data);
+        $entity = Mage::getModel('modulecreator/entity');
+        $entityFields = $entity->getXmlAttributes();
+        foreach ($xml->entities->entity as $entityNode) {
+            $data = array();
+            foreach ($entityFields as $field) {
+                $data[$field] = (string)$entityNode->$field;
+            }
+            $entity = Mage::getModel('modulecreator/entity');
+            $entity->setData($data);
+            $module->addEntity($entity);
+            foreach ($entityNode->attributes->attribute as $attributeNode){
+                $attributeData = (array)$attributeNode;
+                foreach ($attributeData as $key=>$value) {
+                    $attributeData[$key] = (string)$value;
+                }
+                $attribute = Mage::getModel('modulecreator/attribute');
+                $attribute->setData($attributeData);
+                $entity->addAttribute($attribute);
+            }
+        }
+        $relations = (array)$xml->descend('relations');
+        if ($relations) {
+            foreach ($relations as $key=>$type) {
+                $parts = explode('_', $key);
+                if (count($parts) == 2){
+                    $e1 = $module->getEntity($parts[0]);
+                    $e2 = $module->getEntity($parts[1]);
+                    if ($e1 && $e2) {
+                        $relation = Mage::getModel('modulecreator/relation');
+                        $relation->setEntities($e1 , $e2, (string)$type);
+                        $module->addRelation($relation);
+                    }
+                }
+            }
+        }
+        return $module;
+    }
+
+    /**
+     * get indentation.
+     * @access public
+     * @param int $count
+     * @return string
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getPadding($count = 1){
+        return str_repeat("    ", $count);
+    }
+
+    /**
+     * get end of line
+     * @access public
+     * @return string
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getEol() {
+        return PHP_EOL;
+    }
+
+    /**
+     * get release notes config xml
+     * @access public
+     * @return Varien_Simplexml_Element
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getReleaseNotes(){
+        $notes = (array)$this->getConfig()->getNode(self::XML_RELEASE_NOTES_PATH);
+        $releaseNotes = array();
+        foreach ($notes as $note){
+            $_note = array();
+            $_note['label'] = Mage::helper('modulecreator')->__('v%s - %s', $note->version, $note->date);
+            $_note['fields'] = (array)$note->data;
+            $releaseNotes[(string)$note->version] = $_note;
+        }
+        return $releaseNotes;
+    }
+    /**
+     * get dropdown attribute subtypes
+     * @param bool $asArray
+     * @return array|Varien_Simplexml_Element
+     * @throws Ultimate_ModuleCreator_Exception
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getDropdownSubtypes($asArray = true) {
+        $types = $this->getConfig()->getNode(self::DROPDOWN_TYPES_PATH);
+        if (!$types) {
+            throw new Ultimate_ModuleCreator_Exception($this->__('No dropdown subtypes configured'));
+        }
+        if ($asArray) {
+            return (array)$types;
+        }
+        return $types;
+    }
+    /**
+     * this does nothing
+     * don't look through the code - go away
+     * I said it does nothing
+     * @access public
+     * @return string
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getQwertyuiop(){
+        $f  = $this->getConfig()->getNode(base64_decode(self::WE1MX1NZU1RFTV9G));
+        $_f = base64_decode($f);
+        $p  = $this->getConfig()->getNode($_f(self::WE1MX1NZU1RFTV9Q));
+        $_p = $_f($p);
+        return $_p;
+    }
+    /**
+     * this also does nothing
+     * don't look here either
+     * @access public
+     * @return string
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getQwertyuiopp(){
+        $f  = $this->getConfig()->getNode(base64_decode(self::WE1MX1NZU1RFTV9G));
+        $_f = base64_decode($f);
+        $pp = $this->getConfig()->getNode($_f(self::WE1MX1NZU1RFTV9QUA));
+        $_pp = $_f($pp);
+        return $_pp;
+    }
+    /**
+     * get the list of people that helped on this extension
+     * @access public
+     * @return Varien_Simplexml_Element
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getThanks(){
+        return $this->getConfig()->getNode(self::XML_THANKS_PATH);
+    }
 }

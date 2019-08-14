@@ -10,53 +10,48 @@
  * It is also available through the world-wide-web at this URL:
  * http://opensource.org/licenses/mit-license.php
  *
- * @category   	Ultimate
- * @package		Ultimate_ModuleCreator
- * @copyright  	Copyright (c) 2012
- * @license		http://opensource.org/licenses/mit-license.php MIT License
- */ 
-/**
- * @category	Ultimate
- * @package		Ultimate_ModuleCreator
- * @author 		Marius Strajeru <marius.strajeru@gmail.com>
- */  
+ * @category       Ultimate
+ * @package        Ultimate_ModuleCreator
+ * @copyright      Copyright (c) 2014
+ * @license        http://opensource.org/licenses/mit-license.php MIT License
+ */
  -->
 <config>
-	<acl>
-		<resources>
-			<admin>
-				<children>
-					<system>
-						<children>
-							<config>
-								<children>
-									<modulecreator translate="title" module="modulecreator">
-										<title>Ultimate module creator</title>
-									</modulecreator>
-								</children>
-							</config>
-							<modulecreator translate="title" module="modulecreator">
-								<title>Module creator</title>
-								<sort_order>10</sort_order>
-							</modulecreator>
-						</children>
-					</system>
-				</children>
-			</admin>
-		</resources>
-	</acl>
-	<menu>
-		<system>
-			<children>
-				<modulecreator translate="title" module="modulecreator">
-					<title>Module creator</title>
-					<sort_order>10</sort_order>
-					<action>adminhtml/modulecreator</action>
-					<depends>
-						<module>Ultimate_ModuleCreator</module>
-					</depends>
-					</modulecreator>
-			</children>
-		</system>
-	</menu>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <modulecreator translate="title" module="modulecreator">
+                                        <title>Ultimate module creator</title>
+                                    </modulecreator>
+                                </children>
+                            </config>
+                            <modulecreator translate="title" module="modulecreator">
+                                <title>Module creator</title>
+                                <sort_order>10</sort_order>
+                            </modulecreator>
+                        </children>
+                    </system>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+    <menu>
+        <system>
+            <children>
+                <modulecreator translate="title" module="modulecreator">
+                    <title>Module creator</title>
+                    <sort_order>10</sort_order>
+                    <action>adminhtml/modulecreator</action>
+                    <depends>
+                        <module>Ultimate_ModuleCreator</module>
+                    </depends>
+                </modulecreator>
+            </children>
+        </system>
+    </menu>
 </config>

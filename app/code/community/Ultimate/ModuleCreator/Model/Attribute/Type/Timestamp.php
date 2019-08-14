@@ -9,74 +9,104 @@
  * It is also available through the world-wide-web at this URL:
  * http://opensource.org/licenses/mit-license.php
  *
- * @category   	Ultimate
- * @package		Ultimate_ModuleCreator
- * @copyright  	Copyright (c) 2012
- * @license		http://opensource.org/licenses/mit-license.php MIT License
- */ 
+ * @category       Ultimate
+ * @package        Ultimate_ModuleCreator
+ * @copyright      Copyright (c) 2014
+ * @license        http://opensource.org/licenses/mit-license.php MIT License
+ * @author         Marius Strajeru <ultimate.module.creator@gmail.com>
+ */
 /**
- * attribute type timestamp
- * 
- * @category	Ultimate
- * @package		Ultimate_ModuleCreator
- * @author 		Marius Strajeru <marius.strajeru@gmail.com>
- */ 
-class Ultimate_ModuleCreator_Model_Attribute_Type_Timestamp extends Ultimate_ModuleCreator_Model_Attribute_Type_Abstract{
-	/**
-	 * sql colum ddl type
-	 * @var string
-	 */
-	protected $_typeDdl 	= 'TYPE_DATETIME';
-	/**
-	 * get the type for the form
-	 * @access public
-	 * @return string
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function getFormType(){
-		return 'date';
-	}
-	/**
-	 * get sql column
-	 * @access public
-	 * @return string
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function getSqlColumn(){
-		return '`'.$this->getAttribute()->getCode().'` datetime '.$this->getNullSql().' default \'0000-00-00\',';
-	}
-	/**
-	 * get the text before the element in the admin form
-	 * @access public
-	 * @return string
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function getPreElementText(){
-		$text = '';
-		$text .= '		$dateFormatIso = Mage::app()->getLocale()->getDateFormat('."\n";
-		$text .= '			Mage_Core_Model_Locale::FORMAT_TYPE_SHORT'."\n";
-		$text .= '		);'."\n";
-		return $text;
-	}
-	/**
-	 * get options for admin form
-	 * @access public
-	 * @return string
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function getFormOptions(){
-		$options = parent::getFormOptions();
-		$options .= '		\'image\'	 => $this->getSkinUrl(\'images/grid-cal.gif\'),'."\n";
-		$options .= '		\'format\'	=> $dateFormatIso,'."\n";
-		return $options;
-	}
-	/**
-	 * get the grid column options
-	 * @access public
-	 * @return string
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function getColumnOptions(){
-		return "'type'	 	=> 'date',"."\n";
-	}
+ * timestamp attribute type
+ *
+ * @category    Ultimate
+ * @package     Ultimate_ModuleCreator
+ * @author      Marius Strajeru <ultimate.module.creator@gmail.com>
+ */
+class Ultimate_ModuleCreator_Model_Attribute_Type_Timestamp
+    extends Ultimate_ModuleCreator_Model_Attribute_Type_Abstract {
+    /**
+     * type code
+     * @var string
+     */
+    protected $_type        = 'timestamp';
+    /**
+     * sql column ddl type
+     * @var string
+     */
+    protected $_typeDdl     = 'TYPE_DATETIME';
+    /**
+     * eav setup type
+     */
+    protected $_setupType   = 'datetime';
+    /**
+     * eav setup input
+     * @var string
+     */
+    protected $_setupInput 	= 'date';
+    /**
+     * setup backend
+     * @var string
+     */
+    protected $_setupBackend = 'eav/entity_attribute_backend_datetime';
+
+    /**
+     * get admin column options
+     * @access public
+     * @return string
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getAdminColumnOptions() {
+        $options = $this->getEol();
+        $options .= $this->getPadding(3);
+        $options .= "'type'=> 'date',".$this->getEol();
+        return $options;
+    }
+    /**
+     * get the type for the form
+     * @access public
+     * @return string
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getFormType() {
+        return 'date';
+    }
+    /**
+     * get html for frontend
+     * @access public
+     * @return string
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getFrontendHtml() {
+        $entityName = $this->getEntity()->getNameSingular(true);
+        $ucEntity   = ucfirst($entityName);
+        $module     = $this->getModule()->getLowerModuleName();
+        $namespace  = $this->getNamespace(true);
+        return '<?php echo Mage::helper(\''.$namespace.'_'.$module.'\')->__("'.$this->getAttribute()->getLabel().'");?>: <?php echo Mage::helper(\'core\')->formatDate($_'.$entityName.'->get'.$this->getAttribute()->getMagicMethodCode().'(), \'full\');?>'.$this->getEol();
+    }
+    /**
+     * get options for admin form
+     * @access public
+     * @return string
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getFormOptions(){
+        $options = parent::getFormOptions();
+        $padding = $this->getPadding(3);
+        $eol     = $this->getEol();
+        $options .= $padding.'\'image\' => $this->getSkinUrl(\'images/grid-cal.gif\'),'.$eol;;
+        $options .= $padding.'\'format\'  => Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT),'.$eol;
+        return $options;
+    }
+    /**
+     * get text for rss
+     * @access public
+     * @return string
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    public function getRssText() {
+        $attribute  = $this->getAttribute();
+        $module     = $this->getModule()->getLowerModuleName();
+        $namespace  = $this->getNamespace(true);
+        return $this->getPadding(3).'$'.'description .= \'<div>\'.Mage::helper(\''.$namespace.'_'.$module.'\')->__(\''.$attribute->getLabel().'\').\': \'.Mage::helper(\'core\')->formatDate($item->get'.$this->getAttribute()->getMagicMethodCode().'(), \'full\').\'</div>\';'.$this->getEol();
+    }
 }

@@ -9,18 +9,12 @@
  * It is also available through the world-wide-web at this URL:
  * http://opensource.org/licenses/mit-license.php
  *
- * @category   	Ultimate
- * @package		Ultimate_ModuleCreator
- * @copyright  	Copyright (c) 2012
- * @license		http://opensource.org/licenses/mit-license.php MIT License
- */ 
-/**
- * Exception
- * 
- * @category	Ultimate
- * @package		Ultimate_ModuleCreator
- * @author 		Marius Strajeru <marius.strajeru@gmail.com>
+ * @category       Ultimate
+ * @package        Ultimate_ModuleCreator
+ * @copyright      Copyright (c) 2014
+ * @license        http://opensource.org/licenses/mit-license.php MIT License
+ * @author         Marius Strajeru <ultimate.module.creator@gmail.com>
  */  
-class Ultimate_ModuleCreator_Exception extends Mage_Core_Exception{
-	
+class Ultimate_ModuleCreator_Exception extends Mage_Core_Exception {
+
 }

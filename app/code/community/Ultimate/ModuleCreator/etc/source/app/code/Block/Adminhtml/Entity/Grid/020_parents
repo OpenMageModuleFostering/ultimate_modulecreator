@@ -1,0 +1,6 @@
+        $this->addColumn('{{sibling}}_id', array(
+            'header'    => Mage::helper('{{namespace}}_{{module}}')->__('{{SiblingLabel}}'),
+            'index'     => '{{sibling}}_id',
+            'type'      => 'options',
+            'options'   => Mage::getResourceModel('{{namespace}}_{{module}}/{{sibling}}_collection')->toOptionHash(),
+        ));

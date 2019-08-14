@@ -9,83 +9,47 @@
  * It is also available through the world-wide-web at this URL:
  * http://opensource.org/licenses/mit-license.php
  *
- * @category   	Ultimate
- * @package		Ultimate_ModuleCreator
- * @copyright  	Copyright (c) 2012
- * @license		http://opensource.org/licenses/mit-license.php MIT License
- */ 
+ * @category       Ultimate
+ * @package        Ultimate_ModuleCreator
+ * @copyright      Copyright (c) 2014
+ * @license        http://opensource.org/licenses/mit-license.php MIT License
+ * @author         Marius Strajeru <ultimate.module.creator@gmail.com>
+ */
 /**
- * attribute block
- * 
- * @category	Ultimate
- * @package		Ultimate_ModuleCreator
- * @author 		Marius Strajeru <marius.strajeru@gmail.com>
- */ 
-class Ultimate_ModuleCreator_Block_Adminhtml_Modulecreator_Edit_Tab_Entities_Entity_Attribute extends Ultimate_ModuleCreator_Block_Adminhtml_Modulecreator_Edit_Tab_Entities_Entity{
-	/**
-	 * get the field id
-	 * @access public
-	 * @return string
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function getFieldId(){
-		return 'attribute';
-	}
-	/**
-	 * get the select with the attribute types
-	 * @param string $id
-	 * @param string $name
-	 * @param string $selected
-	 * @access public
-	 * @return string
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function getAttributeTypeSelect($id, $name, $selected){
-		$types = Mage::helper('modulecreator')->getAttributeTypes();
-		$select = $this->getLayout()->createBlock('adminhtml/html_select')
-			->setData(array(
-				'class' => 'select required-entry',
-				'id'	=> $id,
-				'name'	=> $name
-			));
-		foreach ($types as $key=>$type){
-			if ($key === $selected){
-				$options = array('selected'=>'selected');
-			}
-			else{
-				$options = array();
-			}
-			$select->addOption($key, $type, $options);
-		}
-		return $select->getHtml();
-	}
-	/**
-	 * get the select for the attribute scope
-	 * not used yet... maybe used in the future for EAV entities
-	 * @param string $id
-	 * @param string $name
-	 * @param string $selected
-	 * @access public
-	 * @return string
-	 * @author Marius Strajeru <marius.strajeru@gmail.com>
-	 */
-	public function getScopeSelect($id, $name, $selected){
-		$scopes = Mage::helper('modulecreator')->getScopes();
-		$select = $this->getLayout()->createBlock('adminhtml/html_select')
-			->setData(array(
-				'class' => 'select required-entry',
-				'id'	=> $id,
-				'name'	=> $name
-			));
-		foreach ($scopes as $key=>$scope){
-			if ($key === $selected){
-				$options = array('selected'=>'selected');
-			}
-			else{
-				$options = array();
-			}
-			$select->addOption($key, $scope, $options);
-		}
-		return $select->getHtml();
-	}
+ * add attribute form
+ *
+ * @category    Ultimate
+ * @package     Ultimate_ModuleCreator
+ * @author      Marius Strajeru <ultimate.module.creator@gmail.com>
+ */
+class Ultimate_ModuleCreator_Block_Adminhtml_Modulecreator_Edit_Tab_Entities_Entity_Attribute
+    extends Mage_Adminhtml_Block_Widget_Form {
+    /**
+     * prepare attribute form
+     * @access protected
+     * @return string
+     * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+     */
+    protected function _prepareForm() {
+        $form = Mage::helper('modulecreator')->getXmlForm('attribute', false);
+        $form->setHtmlIdPrefix('attribute_'.$this->getEntityId().'_'.$this->getIncrement().'_');
+        $form->addFieldNameSuffix('entity['.$this->getEntityId().'][attributes]['.$this->getIncrement().']');
+        $this->setForm($form);
+        $form->addValues($this->getAttributeInstance()->getData());
+        return parent::_prepareForm();
+    }
+
+    /**
+    * set an entity with default values
+    * @access public
+    * @return Ultimate_ModuleCreator_Block_Adminhtml_Modulecreator_Edit_Tab_Entities_Entity
+    * @author Marius Strajeru <ultimate.module.creator@gmail.com>
+    */
+    public function setDefaultAttributeInstance() {
+        $attribute = Mage::getModel('modulecreator/attribute');
+        $settings  = Mage::getStoreConfig(Ultimate_ModuleCreator_Helper_Data::XML_ATTRIBUTE_CONFIG_PATH);
+        $attribute->addData($settings);
+        $this->setAttributeInstance($attribute);
+        return $this;
+    }
 }
