@@ -165,6 +165,9 @@ class Ultimate_ModuleCreator_Model_Module extends Ultimate_ModuleCreator_Model_A
         if ($entity->getSearch()) {
             $this->setSearch(true);
         }
+        if ($entity->getProductAttribute() ||$entity->getCategoryAttribute()) {
+            $this->setHasCatalogAttribute(true);
+        }
         Mage::dispatchEvent('umc_module_add_entity_after', array('entity'=>$entity, 'module'=>$this));
         return $this;
     }
@@ -428,7 +431,16 @@ class Ultimate_ModuleCreator_Model_Module extends Ultimate_ModuleCreator_Model_A
         try{
             $io = $this->getIo();
             $io->mkdir(dirname($destinationFile));
-            $io->write($destinationFile, $contents, 0777);
+            /**
+             * Varien_Io_File has changed in 1.8 A LOT
+             */
+            if (version_compare(Mage::getVersion(), '1.8', '<')) {
+                $io->write($destinationFile, $contents, 0777);
+            }
+            else {
+                $io->filePutContent($destinationFile, $contents);
+            }
+
         }
         catch (Exception $e){
             if ($e->getCode() != 0){
@@ -921,6 +933,7 @@ class Ultimate_ModuleCreator_Model_Module extends Ultimate_ModuleCreator_Model_A
                 }
             }
         }
+
         if ($config->after_build){
             $function   = (string)$config->after_build;
             $content    = $this->$function($content);
@@ -1403,7 +1416,7 @@ class Ultimate_ModuleCreator_Model_Module extends Ultimate_ModuleCreator_Model_A
         $xml .= $this->getPadding($padding++).'<children>'.$eol;
         $xml .= $this->getEntityMenu($padding);
         $xml .= $this->getPadding(--$padding).'</children>'.$eol;
-        $xml .= $this->getPadding(--$padding).'</'.$namespace.'_'.$this->getLowerModuleName().'>'.$eol;
+        $xml .= $this->getPadding(--$padding).'</'.$namespace.'_'.$this->getLowerModuleName().'>';
 
         $parts = array_reverse($parts);
         foreach ($parts as $part){
@@ -1433,11 +1446,11 @@ class Ultimate_ModuleCreator_Model_Module extends Ultimate_ModuleCreator_Model_A
             $xml .= $this->getPadding($padding++).'<children>'.$eol;
         }
         $xml .= $this->getPadding($padding++).'<'.$namespace.'_'.$this->getLowerModuleName().' translate="title" module="'.$namespace.'_'.$this->getLowerModuleName().'">'.$eol;
-        $xml .= $this->getPadding($padding++).'<title>'.$this->getMenuText().'</title>'.$eol;
+        $xml .= $this->getPadding($padding).'<title>'.$this->getMenuText().'</title>'.$eol;
         $xml .= $this->getPadding($padding++).'<children>'.$eol;
         $xml .= $this->getEntityMenuAcl($padding);
         $xml .= $this->getPadding(--$padding).'</children>'.$eol;
-        $xml .= $this->getPadding(--$padding).'</'.$namespace.'_'.$this->getLowerModuleName().'>'.$eol;
+        $xml .= $this->getPadding(--$padding).'</'.$namespace.'_'.$this->getLowerModuleName().'>';
 
         $parts = array_reverse($parts);
         foreach ($parts as $part){
@@ -1454,7 +1467,7 @@ class Ultimate_ModuleCreator_Model_Module extends Ultimate_ModuleCreator_Model_A
      * @author Marius Strajeru <ultimate.module.creator@gmail.com>
      */
     public function getResourceSetupModel(){
-        if ($this->getHasCatalogRelation() || $this->getHasEav()){
+        if ($this->getHasCatalogRelation() || $this->getHasEav() || $this->getHasCatalogAttribute()){
             return 'Mage_Catalog_Model_Resource_Setup';
         }
         return 'Mage_Core_Model_Resource_Setup';

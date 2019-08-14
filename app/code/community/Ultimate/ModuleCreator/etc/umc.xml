@@ -700,7 +700,7 @@
                             <required>1</required>
                             <position>170</position>
                             <depend_class>type-dropdown type-multiselect custom-source</depend_class>
-                            <note>Separate by | (pipe)</note>
+                            <note>One option on each row</note>
                             <tooltip>If you choose to enter the values for the dropdown or multiselect manually, input them here. Separate the options with | (pipe). If you want an empty option at the begining start with a | (pipe) symbol.</tooltip>
                         </options>
                     </fields>
@@ -1002,6 +1002,54 @@
         <f>YmFzZTY0X2RlY29kZQ==</f>
     </system>
     <release_notes>
+        <v1_9_1_2>
+            <version>1.9.1.2</version>
+            <date>2014-06-12</date>
+            <data>
+                <separator translate="label type comment">
+                    <label>Changed dropdown options separator to new line instead of pipe (|)</label>
+                    <type>Improvement</type>
+                    <comment><![CDATA[<a href="https://github.com/tzyganu/UMC1.9/issues/29" target="_blank">#29</a>]]></comment>
+                </separator>
+                <escape translate="label type comment">
+                    <label>Escaped attribute labels and notes.</label>
+                    <type>Bug fix</type>
+                    <comment><![CDATA[<a href="https://github.com/tzyganu/UMC1.9/issues/28" target="_blank">#28</a>]]></comment>
+                </escape>
+            </data>
+        </v1_9_1_2>
+        <v1_9_1_1>
+            <version>1.9.1.1</version>
+            <date>2014-06-11</date>
+            <data>
+                <resource_model translate="label type comment">
+                    <label>Wrong resource model parent</label>
+                    <type>Bug Fix</type>
+                    <comment><![CDATA[For modules with entities that are marked as being product or category attributes the resource model parent class is set to `Mage_Core_Model_Resource_Setup` and it should be `Mage_Catalog_Model_Resource_Setup`]]></comment>
+                </resource_model>
+            </data>
+        </v1_9_1_1>
+        <v1_9_1_0>
+            <version>1.9.1.0</version>
+            <date>2014-06-03</date>
+            <data>
+                <missing_images translate="label type comment">
+                    <label>Tree entity list images not generated</label>
+                    <type>Bug Fix</type>
+                    <comment><![CDATA[Images for the tree entities were not generated for Magento 1.8+]]></comment>
+                </missing_images>
+                <category_relation translate="label type comment">
+                    <label>Category relation bug</label>
+                    <type>Bug Fix</type>
+                    <comment><![CDATA[Category relation tab appears for tree entities even if not set to yes.]]></comment>
+                </category_relation>
+                <top_menu translate="label type comment">
+                    <label>Entities link top menu does not get selected.</label>
+                    <type>Bug Fix</type>
+                    <comment><![CDATA[Entities link top menu does not get selected.]]></comment>
+                </top_menu>
+            </data>
+        </v1_9_1_0>
         <v1_9_0_1>
             <version>1.9.0.1</version>
             <date>2014-05-02</date>
@@ -1505,5 +1553,9 @@
             <to>@access3000</to>
             <for>Thanks for the free testing and the submitted issues. I would have never found them.</for>
         </access3000>
+        <greenwellness>
+            <to>@greenwellness</to>
+            <for>Thanks for the free testing and good ideas.</for>
+        </greenwellness>
     </thanks>
 </config>
