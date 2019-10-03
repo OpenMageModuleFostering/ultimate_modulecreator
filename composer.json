@@ -1,16 +1,19 @@
 {
-    "name": "OpenMageModuleFostering/Ultimate_ModuleCreator",
+    "name": "OpenMageModuleFostering\/Ultimate_ModuleCreator",
     "type": "magento-module",
-    "license": "http://opensource.org/licenses/MIT",
+    "license": "http:\/\/opensource.org\/licenses\/MIT",
     "homepage": "",
     "description": "Develop custom Magento modules without writing any code. Use a module creator. Use this module creator",
     "authors": [
-    {
-        "name": "Marius Strajeru",
-        "email": "marius.strajeru@gmail.com"
-    }
-],
+        {
+            "name": "Marius Strajeru",
+            "email": "marius.strajeru@gmail.com"
+        }
+    ],
     "suggest": {
-        "magento-hackathon/magento-composer-installer": "*"
-    }
+        "magento-hackathon\/magento-composer-installer": "*"
+    },
+    "keywords": [
+        "openmage-module"
+    ]
 }
